@@ -174,3 +174,117 @@ int insercao(Tregistro *registro) {
 
 	return 1;
 }
+
+
+int busca() {
+	printf("\nBusca\n\n");
+}
+
+int remocao() {
+	printf("\nRemoção\n\n");
+}
+
+int listagem() {
+	printf("\nListagem\n\n");
+
+	// tenta abrir o arquivo
+	FILE *arquivo = fopen("trabalho_ORI.bin", "r+b");
+	if (arquivo == NULL) { // caso dê erro, avisa e encerra
+		printf("Houve um problema na abertura do arquivo, tente novamente!");
+		return 0;
+	}
+
+	// lê o cabeçalho
+	fseek(arquivo, 0, SEEK_SET); // coloca o PCA no começo do arquivo
+	Tcabecalho cabecalhoLido;
+	fread(&cabecalhoLido, sizeof(Tcabecalho), 1, arquivo);
+
+	// verifica a quantidade de blocos que há no arquivo
+	int qtdBlocosNoArquivo = cabecalhoLido.ultimoBlocoDoArquivo + 1;
+
+	printf("qtdBlocosNoArquivo = %d\n\n", qtdBlocosNoArquivo);
+
+
+	// vai lendo os blocos um a um
+	Tbloco blocoLido;
+	for (int i = 0; i < qtdBlocosNoArquivo; i++) {
+		fread(&blocoLido, sizeof(Tbloco), 1, arquivo);
+
+		// lê os registros do bloco um a um
+		printf("blocoLido: id = %d", blocoLido.id);
+		int qtdRegistrosNoBloco = blocoLido.ultimoRegistroDoBloco + 1;
+		printf(" qtdRegistrosNoBloco = %d\n", qtdRegistrosNoBloco);
+		Tregistro registroLido;
+		for (int j = 0; j < qtdRegistrosNoBloco; j++) {
+			registroLido = blocoLido.registrosDoBloco[j];
+			// imprime os dados do registro
+			printf("Bloco: %d\n", blocoLido.id);
+			printf("Registro = %d\n", j);
+			printf("ID: %d \n", registroLido.id);
+			printf("Nome: %s \n", registroLido.nome);
+			printf("Nota: %d \n\n", registroLido.nota);
+		}
+	}
+
+	// fecha o arquivo
+	fclose(arquivo);
+
+	return 1;
+}
+
+int compactacao() {
+	printf("\nCompactação\n\n");
+}
+
+int menu(){
+	Tregistro registro;
+	int opcao;
+	do {
+		printf("Escolha uma opção:\n\n");
+		printf("1 Criação do arquivo\n");
+		printf("2 Inserção de um novo registro\n");
+		printf("3 Busca de um registro\n");
+		printf("4 Remoção de um registro\n");
+		printf("5 Listagem dos registros\n");
+		printf("6 Compactação do arquivo\n");
+		printf("0 Sair\n");
+		printf("\nDigite a opção desejada: ");
+		scanf("%d", &opcao);
+
+		if (opcao >= 0 || opcao <= 6) {
+			switch(opcao) {
+				case 1:
+					criacao();
+					break;
+				case 2:
+					registro = criaRegistro();
+					insercao(&registro);
+					break;
+				case 3:
+					busca();
+					break;
+				case 4:
+					remocao();
+					break;
+				case 5:
+					listagem();
+					break;
+				case 6:
+					compactacao();
+					break;
+				case 0:
+					break;
+				default:
+					printf("\n\n\nOpção inválida, tente novamente!\n\n\n");
+					break;
+
+			}
+		}
+	}
+	while (opcao != 0);
+}
+
+int main() {
+
+	menu();
+}
