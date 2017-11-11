@@ -24,3 +24,44 @@ typedef struct {
 	int ultimoBlocoComRemocao;
 	int ultimoBlocoDoArquivo;
 } Tcabecalho; // cabeçalho do arquivo possui 8 bytes
+
+
+/* Função que inicializa o arquivo de dados
+   Retorna:
+   1 se a criação ocorreu
+   0 caso tenha ocorrido erro */
+int criacao() {
+	printf("\nCriação\n\n");
+
+	// cria um arquivo novo
+	FILE *arquivo = fopen("trabalho_ORI.bin", "w+b");
+	if (arquivo == NULL) {
+		printf("Houve um problema na abertura do arquivo, tente novamente!");
+		return 0;
+	}
+	
+	// cria o cabeçalho
+	Tcabecalho cabecalho;
+	cabecalho.ultimoBlocoComRemocao = -1;
+	cabecalho.ultimoBlocoDoArquivo = 0;
+	
+	// cria o primeiro bloco
+	Tbloco primeiroBloco;
+	primeiroBloco.id = 0;
+	primeiroBloco.ultimoRegistroRemovido = -1;
+	primeiroBloco.ultimoRegistroDoBloco = -1;
+	
+	// grava o cabeçalho no arquivo
+	fseek(arquivo, 0, SEEK_SET);
+	fwrite(&cabecalho, sizeof(Tcabecalho), 1,  arquivo);
+
+	// grava o primeiro bloco no arquivo
+	fwrite(&primeiroBloco, sizeof(Tbloco), 1, arquivo);
+	
+	// fecha o arquivo
+	fclose(arquivo);
+
+	printf("\nArquivo criado!\n\n");
+
+	return 1;
+}	
