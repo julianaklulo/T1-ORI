@@ -65,3 +65,33 @@ int criacao() {
 
 	return 1;
 }	
+
+
+/* Função que atualiza o cabeçalho quando um novo bloco é criado
+   Retorna:
+   1 se a atualização ocorreu
+   0 caso tenha ocorrido erro */
+int atualizaCabecalho() {
+	// tenta abrir o arquivo
+	FILE *arquivo = fopen("trabalho_ORI.bin", "r+b");
+	if (arquivo == NULL) { // caso dê erro, avisa e encerra
+		printf("Houve um problema na abertura do arquivo, tente novamente!");
+		return 0;
+	}
+
+	// lê o cabeçalho
+	Tcabecalho cabecalho;
+	fread(&cabecalho, sizeof(Tcabecalho), 1, arquivo);
+	
+	// atualiza o cabecalho
+	cabecalho.ultimoBlocoDoArquivo++;
+	
+	// grava o cabeçalho atualizado
+	fseek(arquivo, 0, SEEK_SET);
+	fwrite(&cabecalho, sizeof(Tcabecalho), 1, arquivo);
+	
+	// fecha o arquivo
+	fclose(arquivo);
+
+	return 1;
+}
