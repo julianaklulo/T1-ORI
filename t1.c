@@ -107,13 +107,28 @@ Tregistro criaRegistro() {
 	printf("Digite o ID do aluno: ");
 	scanf("%d", &aluno.id);
 	printf("Digite o Nome do aluno: ");
-	scanf("%s", &aluno.nome);
+	scanf("%s", aluno.nome);
 	printf("Digite a Nota do aluno: ");
-	scanf("%d", aluno.nota);
+	scanf("%d", &aluno.nota);
 
 	return aluno;
 }
 
+
+/* Função que recebe um bloco e lê os registros contidos nele
+   Parâmetros: registro a ser lido */
+void imprimeBloco(Tbloco bloco) {
+	Tregistro registroLido;
+
+	// repete para quantos registros tiver no bloco
+	for (int i = 0; i <= bloco.ultimoRegistroDoBloco; i++) {
+		registroLido = bloco.registrosDoBloco[i];
+		printf("ID do aluno: %d\n", registroLido.id);
+		printf("Nome do aluno: %s\n", registroLido.nome);
+		printf("Nota do aluno: %d\n\n", registroLido.nota);
+	}
+}
+	
 
 /* Função que escreve um registro no bloco
    Parâmetros: registro a ser gravado
@@ -124,7 +139,7 @@ int insercao(Tregistro *registro) {
 	printf("\nInserção\n\n");
 
 	// tenta abrir o arquivo
-	FILE *arquivo = fopen("trabalho_ORI.bin", "a+b");
+	FILE *arquivo = fopen("trabalho_ORI.bin", "r+b");
 	if (arquivo == NULL) { // caso dê erro, avisa e encerra
 		printf("Houve um problema na abertura do arquivo, tente novamente!");
 		return 0;
@@ -151,7 +166,7 @@ int insercao(Tregistro *registro) {
 		// tenta abrir o arquivo
 			FILE *arquivo = fopen("trabalho_ORI.bin", "a+b");
 			if (arquivo == NULL) { // caso dê erro, avisa e encerra
-				printf("Houve um problema na abertura do arquivo, tente novamente!");
+				printf("Houve um prob);lema na abertura do arquivo, tente novamente!");
 				return 0;
 			}
 
@@ -194,36 +209,13 @@ int listagem() {
 		return 0;
 	}
 
-	// lê o cabeçalho
-	fseek(arquivo, 0, SEEK_SET); // coloca o PCA no começo do arquivo
-	Tcabecalho cabecalhoLido;
-	fread(&cabecalhoLido, sizeof(Tcabecalho), 1, arquivo);
-
-	// verifica a quantidade de blocos que há no arquivo
-	int qtdBlocosNoArquivo = cabecalhoLido.ultimoBlocoDoArquivo + 1;
-
-	printf("qtdBlocosNoArquivo = %d\n\n", qtdBlocosNoArquivo);
-
+	// pula o cabeçalho
+	fseek(arquivo, sizeof(Tcabecalho), SEEK_SET);
 
 	// vai lendo os blocos um a um
 	Tbloco blocoLido;
-	for (int i = 0; i < qtdBlocosNoArquivo; i++) {
-		fread(&blocoLido, sizeof(Tbloco), 1, arquivo);
-
-		// lê os registros do bloco um a um
-		printf("blocoLido: id = %d", blocoLido.id);
-		int qtdRegistrosNoBloco = blocoLido.ultimoRegistroDoBloco + 1;
-		printf(" qtdRegistrosNoBloco = %d\n", qtdRegistrosNoBloco);
-		Tregistro registroLido;
-		for (int j = 0; j < qtdRegistrosNoBloco; j++) {
-			registroLido = blocoLido.registrosDoBloco[j];
-			// imprime os dados do registro
-			printf("Bloco: %d\n", blocoLido.id);
-			printf("Registro = %d\n", j);
-			printf("ID: %d \n", registroLido.id);
-			printf("Nome: %s \n", registroLido.nome);
-			printf("Nota: %d \n\n", registroLido.nota);
-		}
+	while (fread(&blocoLido, sizeof(Tbloco), 1, arquivo) == 1) {
+		imprimeBloco(blocoLido);
 	}
 
 	// fecha o arquivo
@@ -231,6 +223,7 @@ int listagem() {
 
 	return 1;
 }
+
 
 int compactacao() {
 	printf("\nCompactação\n\n");
