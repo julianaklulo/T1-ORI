@@ -95,3 +95,21 @@ int atualizaCabecalho() {
 
 	return 1;
 }
+
+
+/* Função que cria o registro, lendo do teclado os dados
+   Retorna:
+   registro com os dados inseridos */
+Tregistro criaRegistro() {
+	// lê do teclado os dados do registro
+	Tregistro aluno;
+
+	printf("Digite o ID do aluno: ");
+	scanf("%d", &aluno.id);
+	printf("Digite o Nome do aluno: ");
+	scanf("%s", &aluno.nome);
+	printf("Digite a Nota do aluno: ");
+	scanf("%d", aluno.nota);
+
+	return aluno;
+}
