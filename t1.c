@@ -113,3 +113,64 @@ Tregistro criaRegistro() {
 
 	return aluno;
 }
+
+
+/* Função que escreve um registro no bloco
+   Parâmetros: registro a ser gravado
+   Retorna:
+   1 se a escrita ocorreu
+   0 caso tenha ocorrido erro */
+int insercao(Tregistro *registro) {
+	printf("\nInserção\n\n");
+
+	// tenta abrir o arquivo
+	FILE *arquivo = fopen("trabalho_ORI.bin", "a+b");
+	if (arquivo == NULL) { // caso dê erro, avisa e encerra
+		printf("Houve um problema na abertura do arquivo, tente novamente!");
+		return 0;
+	}
+
+	// lê o último bloco
+	fseek(arquivo, -sizeof(Tbloco), SEEK_END);
+	Tbloco ultimoBloco;
+	fread(&ultimoBloco, sizeof(Tbloco), 1, arquivo);
+
+	// insere no último bloco
+	ultimoBloco.ultimoRegistroDoBloco++;
+	ultimoBloco.registrosDoBloco[ultimoBloco.ultimoRegistroDoBloco] = *registro;
+
+	// grava o bloco modificado
+	fseek(arquivo, -sizeof(Tbloco), SEEK_END);
+	fwrite(&ultimoBloco, sizeof(Tbloco), 1, arquivo);
+
+	// fecha o arquivo
+	fclose(arquivo);
+
+	// confere se o bloco ficou cheio
+	if (ultimoBloco.ultimoRegistroDoBloco == registrosPorBloco - 1) {
+		// tenta abrir o arquivo
+			FILE *arquivo = fopen("trabalho_ORI.bin", "a+b");
+			if (arquivo == NULL) { // caso dê erro, avisa e encerra
+				printf("Houve um problema na abertura do arquivo, tente novamente!");
+				return 0;
+			}
+
+		// cria o bloco novo
+		Tbloco novoBloco;
+		novoBloco.id = ultimoBloco.id + 1;
+		novoBloco.ultimoRegistroRemovido = -1;
+		novoBloco.ultimoRegistroDoBloco = -1;
+
+		// grava o novo bloco
+		fseek(arquivo, 0, SEEK_END);
+		fwrite(&novoBloco, sizeof(Tbloco), 1, arquivo);
+
+		// fecha o arquivo
+		fclose(arquivo);
+
+		// atualiza o cabeçalho
+		atualizaCabecalho();
+	}
+
+	return 1;
+}
